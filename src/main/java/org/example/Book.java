@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class Book implements Serializable {
 
@@ -18,22 +19,24 @@ public class Book implements Serializable {
     private List<String> tags;
 
     public Book(String title, String author, PublicationDate publicationDate, String genre, List<String> tags) {
-        for (Object param : List.of(title, author, publicationDate, tags)) {
-            if (param == null) {
-                throw new IllegalArgumentException("Constructor parameters cannot be null.");
-            }
+        if (title == null) {
+            throw new IllegalArgumentException("Title cannot be null.");
         }
-
+        if (author == null) {
+            throw new IllegalArgumentException("Author cannot be null.");
+        }
+        if (publicationDate == null) {
+            throw new IllegalArgumentException("Publication date cannot be null.");
+        }
+        if (tags == null) {
+            throw new IllegalArgumentException("Tags cannot be null.");
+        }
         if (tags.isEmpty()) {
             throw new IllegalArgumentException("Tags cannot be empty.");
         }
-
-        for (String tag : tags) {
-            if (tag == null) {
-                throw new IllegalArgumentException("Tags cannot contain null values.");
-            }
+        if (tags.getFirst() == null || (tags.size() > 1 && tags.contains(null))) {
+            throw new IllegalArgumentException("Tags cannot contain null values.");
         }
-
         if (genre.isBlank()) {
             throw new IllegalArgumentException("Genre cannot be blank.");
         }
@@ -47,21 +50,25 @@ public class Book implements Serializable {
         extent.add(this);
     }
 
-    public Book(String title, String author, PublicationDate publicationDate, List<String> tags) {
-        for (Object param : List.of(title, author, publicationDate, tags)) {
-            if (param == null) {
-                throw new IllegalArgumentException("Constructor parameters cannot be null.");
-            }
-        }
 
+    public Book(String title, String author, PublicationDate publicationDate, List<String> tags) {
+        if (title == null) {
+            throw new IllegalArgumentException("Title cannot be null.");
+        }
+        if (author == null) {
+            throw new IllegalArgumentException("Author cannot be null.");
+        }
+        if (publicationDate == null) {
+            throw new IllegalArgumentException("Publication date cannot be null.");
+        }
+        if (tags == null) {
+            throw new IllegalArgumentException("Tags cannot be null.");
+        }
         if (tags.isEmpty()) {
             throw new IllegalArgumentException("Tags cannot be empty.");
         }
-
-        for (String tag : tags) {
-            if (tag == null) {
-                throw new IllegalArgumentException("Tags cannot contain null values.");
-            }
+        if (tags.getFirst() == null || (tags.size() > 1 && tags.contains(null))) {
+            throw new IllegalArgumentException("Tags cannot contain null values.");
         }
 
         this.title = title;
@@ -72,6 +79,7 @@ public class Book implements Serializable {
         totalBooksCount++;
         extent.add(this);
     }
+
 
     public static List<Book> getBooks() {
         return Collections.unmodifiableList(extent);
@@ -146,15 +154,25 @@ public class Book implements Serializable {
     }
 
     public String getGenre() {
+        if (genre == null) {
+            return "No genre";
+        }
         return genre;
     }
 
     public void setGenre(String genre) {
-        if (genre == null || genre.isBlank()) {
+        if (genre.isBlank()) {
             throw new IllegalArgumentException("Genre cannot be blank.");
         }
+
+        if (genre == null) {
+            this.genre = "no genre";
+            return;
+        }
+
         this.genre = genre;
     }
+
 
     public List<String> getTags() {
         return Collections.unmodifiableList(tags);
@@ -190,20 +208,22 @@ public class Book implements Serializable {
 
     public String getBookInfo(boolean includeDetails) {
         if (includeDetails) {
-            return "Title: " + title + ", Author: " + author + ", Publication Date: " + publicationDate + ", Genre: " + genre;
+            String genreInfo = (genre != null) ? genre : "No genre";
+            return "Title: " + title + ", Author: " + author + ", Publication Date: " + publicationDate + ", Genre: " + genreInfo;
         } else {
             return "Title: " + title;
         }
     }
 
+
     @Override
     public String toString() {
-        return "Book{" +
-                "title='" + title + '\'' +
-                ", author='" + author + '\'' +
-                ", publicationDate=" + publicationDate +
-                (genre != null ? ", genre='" + genre + '\'' : "") +
-                ", tags=" + tags +
-                '}';
+        String result = "Title: " + title + ", Author: " + author + ", Date: " + publicationDate;
+        if (genre != null) {
+            result += ", Genre: " + genre;
+        }
+        result += ", Tags: " + tags;
+        return result;
     }
+
 }
